@@ -35,6 +35,7 @@ jobs:
         with:
           name: uping-macos
           path: uping
+          retention-days: 1
 
   release:
     name: Publish latest release
