@@ -24,6 +24,7 @@ jobs:
         with:
           name: uping-linux
           path: uping
+          retention-days: 1
 
   build-macos:
     name: Build (macos-latest)
