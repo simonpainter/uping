@@ -66,8 +66,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release delete latest --cleanup-tag --yes \
-            --repo ${{ github.repository }} 2>/dev/null || true
+          set +e
+          release_view_output="$(gh release view latest --repo ${{ github.repository }} 2>&1)"
+          release_view_status=$?
+          set -e
+
+          if [ "$release_view_status" -eq 0 ]; then
+            gh release delete latest --cleanup-tag --yes --repo ${{ github.repository }}
+          elif echo "$release_view_output" | grep -Eqi '(release .*not found|HTTP 404)'; then
+            echo "Release 'latest' does not exist; skipping deletion."
+          else
+            echo "$release_view_output" >&2
+            exit "$release_view_status"
+          fi
 
       - name: Create latest release
         env:
